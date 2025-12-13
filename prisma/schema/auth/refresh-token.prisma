@@ -1,0 +1,13 @@
+model RefreshToken {
+    id        Int      @id @default(autoincrement())
+    token     String   @unique
+    userId    Int      @map("user_id")
+    ip        String
+    expiresAt DateTime @map("expires_at")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Se coloca onDelete = onCascade porque si se elimina un usuario se deben eliminar sus refresh tokens
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("refresh_tokens")
+}

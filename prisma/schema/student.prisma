@@ -1,0 +1,16 @@
+model Student {
+    id             Int       @id @default(autoincrement())
+    name           String
+    email          String    @unique
+    countryId      Int       @map("country_id")
+    documentNumber String    @unique @map("document_number")
+    createdBy      Int       @map("created_by")
+    createdAt      DateTime  @default(now()) @map("created_at")
+    updatedAt      DateTime  @updatedAt @map("updated_at")
+    deletedAt      DateTime? @map("deleted_at")
+
+    country Country @relation(fields: [countryId], references: [id])
+    creator User    @relation(fields: [createdBy], references: [id])
+
+    @@map("students")
+}

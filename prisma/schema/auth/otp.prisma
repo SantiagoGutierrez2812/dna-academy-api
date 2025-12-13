@@ -1,0 +1,19 @@
+model Otp {
+    id        Int       @id @default(autoincrement())
+    code      String    @unique
+    type      OtpType
+    userId    Int       @map("user_id")
+    expiresAt DateTime  @map("expires_at")
+    usedAt    DateTime? @map("used_at")
+    createdAt DateTime  @default(now()) @map("created_at")
+
+    // Se coloca onDelete = onCascade porque si se elimina un usuario se deben eliminar sus otps
+    user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+    @@map("otps")
+}
+
+enum OtpType {
+    LOGIN
+    RESET
+}
