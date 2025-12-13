@@ -6,4 +6,6 @@ model LoginAttempt {
     lockUntil  DateTime? @map("lock_until")
     createdAt  DateTime  @default(now()) @map("created_at")
     updatedAt  DateTime  @updatedAt @map("updated_at")
+
+    @@map("login_attempts")
 }

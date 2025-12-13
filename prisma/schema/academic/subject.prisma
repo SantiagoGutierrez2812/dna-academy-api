@@ -1,0 +1,14 @@
+model Subject {
+    id             Int       @id @default(autoincrement())
+    name           String    @unique
+    professionalId Int       @map("professional_id")
+    createdAt      DateTime  @default(now()) @map("created_at")
+    updatedAt      DateTime  @updatedAt @map("updated_at")
+    deletedAt      DateTime? @map("deleted_at")
+
+    // Relaciones
+    professional     User             @relation(fields: [professionalId], references: [id])
+    studentsSubjects StudentSubject[]
+
+    @@map("subjects")
+}

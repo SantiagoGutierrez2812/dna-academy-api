@@ -1,0 +1,14 @@
+// Tabla intermedia para la relación de muchos a muchos entre student y subject
+model StudentSubject {
+    id        Int      @id @default(autoincrement())
+    studentId Int      @map("student_id")
+    subjectId Int      @map("subject_id")
+    createdAt DateTime @default(now()) @map("created_at")
+
+    // Relaciones
+    student Student @relation(fields: [studentId], references: [id])
+    subject Subject @relation(fields: [subjectId], references: [id])
+    grades  Grade[]
+
+    @@map("students_subjects")
+}

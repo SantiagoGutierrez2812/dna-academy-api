@@ -1,6 +1,6 @@
 import app from "./app";
-import appConfig from "./config/app.config";
-import { connectDB, disconnectDB } from "./config/database";
+import appConfig from "./configs/app.config";
+import { connectDB, disconnectDB } from "./configs/database";
 
 export function startServer() {
     try {
