@@ -1,8 +1,6 @@
-import type { Request, Response, NextFunction, RequestHandler } from "express";
-import userRepository from "../repositories/user.repository";
+import type { Request, Response } from "express";
 import type { User } from "@prisma/client";
 import userService from "../services/user.service";
-
 
 class UserController {
 

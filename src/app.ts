@@ -4,12 +4,15 @@ import routes from "./routes/index"
 import { errorHandler } from "./middlewares/errorHandler";
 import helmet from "helmet";
 import morgan from "morgan";
+import cookieParser from "cookie-parser";
 
 const app = express();
 
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("dev"));
+
+app.use(cookieParser());
 
 app.use("/api", routes);
 

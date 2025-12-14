@@ -53,4 +53,4 @@ export const createUserValidator = [
         .withMessage(`El rol debe ser uno de: ${validRoles.join(", ")}`),
 
     validator
-]
+];
