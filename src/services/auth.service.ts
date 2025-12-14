@@ -12,6 +12,7 @@ import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from ".
 import refreshTokenRepository from "../repositories/auth/refreshToken.repository";
 import type { LoginResponse } from "../types/auth.types";
 import type { RefreshTokenPayload } from "../types/jwt.types";
+import { handlePrismaError } from "../utils/prisma-error.utils";
 
 /**
  * Servicio de autenticación.
@@ -52,6 +53,7 @@ class AuthService {
 
     /**
      * Verifica si la cuenta está bloqueada por exceso de intentos fallidos.
+     * Si el bloqueo expiró, resetea los intentos para empezar de cero.
      * @param identifier - Email del usuario
      * @throws HttpError 403 si la cuenta está bloqueada temporalmente
     */
@@ -59,8 +61,16 @@ class AuthService {
         const loginAttempt: LoginAttempt | null
             = await loginAttemptRepository.findUnique({ identifier });
 
-        if (loginAttempt && loginAttempt.lockUntil && loginAttempt.lockUntil > new Date()) {
+        if (!loginAttempt) return;
+
+        // Si está bloqueado y el bloqueo no ha expirado, lanza error
+        if (loginAttempt.lockUntil && loginAttempt.lockUntil > new Date()) {
             throw new HttpError(403, "Cuenta bloqueada");
+        }
+
+        // Si había un bloqueo pero ya expiró, resetear intentos
+        if (loginAttempt.lockUntil && loginAttempt.lockUntil <= new Date()) {
+            await loginAttemptRepository.resetAttempts(identifier);
         }
     }
 
@@ -241,7 +251,11 @@ class AuthService {
 
         const refreshTokenExpiresAt = new Date(Date.now() + appConfig.JWT_REFRESH_EXP_DAYS * 24 * 60 * 60 * 1000);
 
-        await refreshTokenRepository.create({ token: refreshToken, userId: user.id, ip, expiresAt: refreshTokenExpiresAt });
+        try {
+            await refreshTokenRepository.create({ token: refreshToken, userId: user.id, ip, expiresAt: refreshTokenExpiresAt });
+        } catch (error: unknown) {
+            handlePrismaError(error);
+        }
 
         return { accessToken, refreshToken };
     }

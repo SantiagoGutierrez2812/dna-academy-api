@@ -3,9 +3,8 @@ import authService from "../services/auth.service";
 import HttpError from "../errors/HttpError";
 import type { LoginResponse } from "../types/auth.types";
 import { AUTH_CONFIG } from "../configs/auth.config";
-import refreshTokenRepository from "../repositories/auth/refreshToken.repository";
-import { verifyAccessToken, verifyRefreshToken } from "../utils/jwt.utils";
-import type { AccessTokenPayload, RefreshTokenPayload } from "../types/jwt.types";
+import userRepository from "../repositories/user.repository";
+import type { User } from "@prisma/client";
 
 
 class AuthController {
@@ -94,6 +93,31 @@ class AuthController {
 
         res.status(200).json({
             message: "Sesión cerrada exitosamente"
+        });
+    }
+
+    async getMe(req: Request, res: Response) {
+
+        const userId: number = req.userId!;
+
+        const user: User | null = await userRepository.find({ id: userId });
+
+        if (!user) {
+            throw new HttpError(404, "Usuario no encontrado");
+        }
+
+        res.status(200).json({
+            message: "Usuario obtenido exitosamente",
+            data: {
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role,
+                    documentNumber: user.documentNumber,
+                    phoneNumber: user.phoneNumber
+                }
+            }
         });
     }
 }

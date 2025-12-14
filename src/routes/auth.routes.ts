@@ -10,7 +10,8 @@ const router = Router();
 router.post("/login", preLoginValidator, asyncHandler(authController.preLogin));
 router.post("/verify-otp-login", verifyLoginOtpValidator, asyncHandler(authController.verifyLoginOtp));
 router.post("/refresh", asyncHandler(authController.refreshAccessToken));
-router.post("/logout", asyncHandler(authMiddleware), asyncHandler(authController.logout));
+router.post("/logout", authMiddleware, asyncHandler(authController.logout));
+router.get("/me", authMiddleware, asyncHandler(authController.getMe));
 
 
 export default router;

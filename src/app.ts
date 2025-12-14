@@ -5,8 +5,15 @@ import { errorHandler } from "./middlewares/errorHandler";
 import helmet from "helmet";
 import morgan from "morgan";
 import cookieParser from "cookie-parser";
+import cors from "cors";
+import appConfig from "./configs/app.config";
 
 const app = express();
+
+app.use(cors({
+    origin: appConfig.FRONTEND_URL,
+    credentials: true
+}));
 
 app.use(express.json());
 app.use(helmet());

@@ -14,8 +14,12 @@ export function handlePrismaError(error: unknown): never {
                 const field = (error.meta?.target as string[])?.[0];
                 throw new HttpError(409, `El ${field} ya ha sido registrado`);
             }
+            case 'P2003': {
+                const field = (error.meta?.field_name as string)?.split('_')[0];
+                throw new HttpError(400, `El ${field || 'registro relacionado'} no existe`);
+            }
             case 'P2025': {
-                throw new HttpError(404, `Registro no registrado`);
+                throw new HttpError(404, `Registro no encontrado`);
             }
         }
     }

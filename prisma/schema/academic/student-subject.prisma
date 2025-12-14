@@ -1,14 +1,17 @@
 // Tabla intermedia para la relación de muchos a muchos entre student y subject
 model StudentSubject {
-    id        Int      @id @default(autoincrement())
-    studentId Int      @map("student_id")
-    subjectId Int      @map("subject_id")
-    createdAt DateTime @default(now()) @map("created_at")
+    id        Int       @id @default(autoincrement())
+    studentId Int       @map("student_id")
+    subjectId Int       @map("subject_id")
+    createdAt DateTime  @default(now()) @map("created_at")
+    deletedAt DateTime? @map("deleted_at")
 
     // Relaciones
     student Student @relation(fields: [studentId], references: [id])
     subject Subject @relation(fields: [subjectId], references: [id])
     grades  Grade[]
 
+    // Índice compuesto para que un estudiante no se inscriba dos veces a la misma materia
+    @@unique([studentId, subjectId])
     @@map("students_subjects")
 }
