@@ -47,8 +47,8 @@ class StudentService {
         }
     }
 
-    async getStudents(): Promise<Student[]> {
-        return await studentRepository.getStudents();
+    async getStudents(search?: string): Promise<Student[]> {
+        return await studentRepository.getStudents(search);
     }
 
     async getStudent(id: number): Promise<Student> {
@@ -81,10 +81,6 @@ class StudentService {
         } catch (error: unknown) {
             handlePrismaError(error);
         }
-    }
-
-    async getSubjects(studentId: number): Promise<StudentSubject[]> {
-        return await studentRepository.getSubjectsByStudentId(studentId);
     }
 
     async unenrollSubject(params: StudentSubjectDto): Promise<StudentSubject> {

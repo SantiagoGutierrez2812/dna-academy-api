@@ -39,9 +39,11 @@ class StudentController {
         });
     }
 
-    async getStudents(_req: Request, res: Response): Promise<void> {
+    async getStudents(req: Request, res: Response): Promise<void> {
 
-        const students: Student[] = await studentService.getStudents();
+        const search = req.query.search as string | undefined;
+
+        const students: Student[] = await studentService.getStudents(search);
 
         res.status(200).json({
             message: "Estudiantes obtenidos exitosamente",
@@ -72,18 +74,6 @@ class StudentController {
         res.status(201).json({
             message: "Inscripción realizada exitosamente",
             data: { enrollment }
-        });
-    }
-
-    async getSubjects(req: Request, res: Response): Promise<void> {
-
-        const id: number = Number(req.params.id);
-
-        const studentSubjects: StudentSubject[] = await studentService.getSubjects(id);
-
-        res.status(200).json({
-            message: "Materias del estudiante obtenidas exitosamente",
-            data: { studentSubjects }
         });
     }
 

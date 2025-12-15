@@ -49,7 +49,7 @@ router.get(
 router.get(
     "/:id",
     authMiddleware,
-    roleMiddleware(["ADMINISTRATOR", "COORDINATOR"]),
+    roleMiddleware(["ADMINISTRATOR", "COORDINATOR", "PROFESSIONAL"]),
     idSubjectValidator,
     asyncHandler(subjectController.getSubject)
 );

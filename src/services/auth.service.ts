@@ -1,13 +1,13 @@
 import jwt from "jsonwebtoken";
 import { Prisma, type LoginAttempt, type Otp, type RefreshToken, type User } from "@prisma/client";
-import type { LoginSuccessfulDto, PreLoginDto } from "../dtos/auth.dto";
+import type { LoginSuccessfulDto, PreLoginDto, RegisterDto } from "../dtos/auth.dto";
 import loginAttemptRepository from "../repositories/auth/loginAttempt.repository";
 import appConfig from "../configs/app.config";
 import HttpError from "../errors/HttpError";
 import userRepository from "../repositories/user.repository";
 import otpRepository from "../repositories/auth/otp.repository";
 import { generateUniqueOtp } from "../utils/otpGenerator.utils";
-import { comparePassword } from "../utils/password.utils";
+import { comparePassword, hashPassword } from "../utils/password.utils";
 import { generateAccessToken, generateRefreshToken, verifyRefreshToken } from "../utils/jwt.utils";
 import refreshTokenRepository from "../repositories/auth/refreshToken.repository";
 import type { LoginResponse } from "../types/auth.types";
@@ -297,6 +297,31 @@ class AuthService {
 
         if (decoded?.sub) {
             await refreshTokenRepository.delete({ token: refreshToken, userId: decoded.sub });
+        }
+    }
+
+    /**
+     * Registra un nuevo profesional en el sistema.
+     * El usuario se crea con rol PROFESSIONAL y estado activo.
+     * @param params - Datos del profesional a registrar
+     * @returns Usuario creado
+     * @throws HttpError 409 si el email o documento ya existe
+     */
+    async register(params: RegisterDto): Promise<User> {
+        try {
+            const hashedPassword = await hashPassword(params.password);
+
+            return await userRepository.create({
+                name: params.name,
+                email: params.email,
+                phoneNumber: params.phoneNumber,
+                documentNumber: params.documentNumber,
+                password: hashedPassword,
+                role: "PROFESSIONAL",
+                active: false
+            });
+        } catch (error: unknown) {
+            handlePrismaError(error);
         }
     }
 }

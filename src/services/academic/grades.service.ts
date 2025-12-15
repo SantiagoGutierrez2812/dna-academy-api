@@ -92,31 +92,6 @@ class GradeService {
         }
     }
 
-    async getGrades(userId: number, role: string): Promise<Grade[]> {
-        if (role === "PROFESSIONAL") {
-            return await gradeRepository.getAllByProfessional(userId);
-        }
-        return await gradeRepository.getAll();
-    }
-
-    async getGrade(id: number, userId: number, role: string): Promise<Grade> {
-
-        const grade: Grade | null = await gradeRepository.find({ id });
-
-        if (!grade) {
-            throw new HttpError(404, "Nota no encontrada");
-        }
-
-        if (role === "PROFESSIONAL") {
-            const enrollment: StudentSubject | null = await studentRepository.getEnroll(grade.studentSubjectId);
-            if (!enrollment) {
-                throw new HttpError(404, "La inscripción no existe");
-            }
-            await this.verifyProfessionalOwnership(enrollment.subjectId, userId);
-        }
-
-        return grade
-    }
 }
 
 export default new GradeService();

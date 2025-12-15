@@ -18,7 +18,7 @@ router.post(
 router.get(
     "/",
     authMiddleware,
-    roleMiddleware(["ADMINISTRATOR"]),
+    roleMiddleware(["ADMINISTRATOR", "COORDINATOR"]),
     asyncHandler(userController.getUsers)
 );
 

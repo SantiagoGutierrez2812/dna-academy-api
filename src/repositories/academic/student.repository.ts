@@ -45,9 +45,18 @@ class StudentRepository {
         });
     }
 
-    async getStudents(): Promise<Student[]> {
+    async getStudents(search?: string): Promise<Student[]> {
         return await prisma.student.findMany({
-            where: { deletedAt: null }
+            where: {
+                deletedAt: null,
+                ...(search && {
+                    OR: [
+                        { name: { contains: search, mode: "insensitive" } },
+                        { email: { contains: search, mode: "insensitive" } },
+                        { documentNumber: { contains: search, mode: "insensitive" } }
+                    ]
+                })
+            }
         });
     }
 
@@ -58,15 +67,8 @@ class StudentRepository {
     }
 
     async unroll(studentId: number, subjectId: number): Promise<StudentSubject> {
-        return await prisma.studentSubject.update({
-            where: { studentId_subjectId: { studentId, subjectId }, deletedAt: null },
-            data: { deletedAt: new Date() }
-        });
-    }
-
-    async getSubjectsByStudentId(studentId: number): Promise<StudentSubject[]> {
-        return await prisma.studentSubject.findMany({
-            where: { studentId, deletedAt: null }
+        return await prisma.studentSubject.delete({
+            where: { studentId_subjectId: { studentId, subjectId } }
         });
     }
 

@@ -32,28 +32,6 @@ class GradeRepository {
         });
     }
 
-    async getAll(): Promise<Grade[]> {
-        return await prisma.grade.findMany({
-            where: {
-                deletedAt: null
-            }
-        });
-    }
-
-    async getAllByProfessional(professionalId: number): Promise<Grade[]> {
-        return await prisma.grade.findMany({
-            where: {
-                deletedAt: null,
-                studentSubject: {
-                    deletedAt: null,
-                    subject: {
-                        professionalId,
-                        deletedAt: null
-                    }
-                }
-            }
-        });
-    }
 }
 
 export default new GradeRepository()

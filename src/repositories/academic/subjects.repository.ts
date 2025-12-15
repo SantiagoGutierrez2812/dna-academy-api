@@ -72,7 +72,7 @@ class SubjectRepository {
         return enrollments.map(enrollment => enrollment.student);
     }
 
-    async getStudentGrades(subjectId: number, studentId: number): Promise<Grade[]> {
+    async getStudentGrades(subjectId: number, studentId: number): Promise<{ studentSubjectId: number | null, grades: Grade[] }> {
         const enrollment = await prisma.studentSubject.findFirst({
             where: {
                 subjectId,
@@ -81,14 +81,16 @@ class SubjectRepository {
             }
         });
 
-        if (!enrollment) return [];
+        if (!enrollment) return { studentSubjectId: null, grades: [] };
 
-        return await prisma.grade.findMany({
+        const grades = await prisma.grade.findMany({
             where: {
                 studentSubjectId: enrollment.id,
                 deletedAt: null
             }
         });
+
+        return { studentSubjectId: enrollment.id, grades };
     }
 }
 

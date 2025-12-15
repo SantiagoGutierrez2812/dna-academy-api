@@ -120,6 +120,23 @@ class AuthController {
             }
         });
     }
+
+    async register(req: Request, res: Response) {
+
+        const user = await authService.register(req.body);
+
+        res.status(201).json({
+            message: "Profesional registrado exitosamente",
+            data: {
+                user: {
+                    id: user.id,
+                    name: user.name,
+                    email: user.email,
+                    role: user.role
+                }
+            }
+        });
+    }
 }
 
 export default new AuthController();

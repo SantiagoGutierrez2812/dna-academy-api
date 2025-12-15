@@ -93,11 +93,11 @@ class SubjectController {
         const userId: number = req.userId!;
         const role: string = req.userRole!;
 
-        const grades: Grade[] = await subjectService.getStudentGrades(subjectId, studentId, userId, role);
+        const { studentSubjectId, grades } = await subjectService.getStudentGrades(subjectId, studentId, userId, role);
 
         res.status(200).json({
             message: "Notas del estudiante obtenidas exitosamente",
-            data: { grades }
+            data: { studentSubjectId, grades }
         });
     }
 }

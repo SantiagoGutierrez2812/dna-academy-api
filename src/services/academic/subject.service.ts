@@ -107,7 +107,7 @@ class SubjectService {
         return await subjectRepository.getStudentsBySubjectId(subjectId);
     }
 
-    async getStudentGrades(subjectId: number, studentId: number, userId: number, role: string): Promise<Grade[]> {
+    async getStudentGrades(subjectId: number, studentId: number, userId: number, role: string): Promise<{ studentSubjectId: number | null, grades: Grade[] }> {
 
         const subject: Subject | null = await subjectRepository.find({ id: subjectId });
 

@@ -9,3 +9,11 @@ export interface LoginSuccessfulDto {
     email: string,
     otp: string
 }
+
+export interface RegisterDto {
+    name: string,
+    email: string,
+    phoneNumber: string,
+    documentNumber: string,
+    password: string
+}

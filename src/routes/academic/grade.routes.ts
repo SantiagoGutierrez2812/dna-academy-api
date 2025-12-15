@@ -31,19 +31,4 @@ router.delete(
     asyncHandler(gradeController.deleteGrade)
 );
 
-router.get(
-    "/",
-    authMiddleware,
-    roleMiddleware(["ADMINISTRATOR", "COORDINATOR", "PROFESSIONAL"]),
-    asyncHandler(gradeController.getGrades)
-);
-
-router.get(
-    "/:id",
-    authMiddleware,
-    roleMiddleware(["ADMINISTRATOR", "COORDINATOR", "PROFESSIONAL"]),
-    idGradeValidator,
-    asyncHandler(gradeController.getGrade)
-);
-
 export default router;

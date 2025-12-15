@@ -41,7 +41,7 @@ router.get(
 router.get(
     "/:id",
     authMiddleware,
-    roleMiddleware(["ADMINISTRATOR", "COORDINATOR"]),
+    roleMiddleware(["ADMINISTRATOR", "COORDINATOR", "PROFESSIONAL"]),
     idStudentValidator,
     asyncHandler(studentController.getStudent)
 );
@@ -60,14 +60,6 @@ router.delete(
     roleMiddleware(["ADMINISTRATOR", "COORDINATOR"]),
     unenrrollValidator,
     asyncHandler(studentController.unenrollSubject)
-);
-
-router.get(
-    "/:id/subjects",
-    authMiddleware,
-    roleMiddleware(["ADMINISTRATOR", "COORDINATOR"]),
-    idStudentValidator,
-    asyncHandler(studentController.getSubjects)
 );
 
 export default router;
