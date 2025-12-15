@@ -1,0 +1,229 @@
+paths:
+  /auth/login:
+    post:
+      tags:
+        - Auth
+      summary: Iniciar proceso de login
+      description: |
+        Envía las credenciales del usuario y genera un código OTP.
+        El OTP se devuelve en la respuesta (en producción se enviaría por email).
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PreLoginRequest'
+            example:
+              email: "admin@gmail.com"
+              password: "Pa55w.rd"
+      responses:
+        '200':
+          description: OTP generado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Se ha enviado un código de verificación a tu email"
+                  data:
+                    type: object
+                    properties:
+                      otp:
+                        type: string
+                        example: "123456"
+        '400':
+          description: Credenciales inválidas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Usuario bloqueado por intentos fallidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/verify-otp-login:
+    post:
+      tags:
+        - Auth
+      summary: Verificar OTP y completar login
+      description: |
+        Verifica el código OTP y completa el proceso de autenticación.
+        Establece cookies HttpOnly con access token y refresh token.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifyOtpRequest'
+            example:
+              email: "admin@gmail.com"
+              otp: "123456"
+      responses:
+        '200':
+          description: Login exitoso
+          headers:
+            Set-Cookie:
+              description: Cookies con access token y refresh token
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Login exitoso"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '400':
+          description: OTP inválido o expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/register:
+    post:
+      tags:
+        - Auth
+      summary: Registrar nuevo profesional
+      description: |
+        Registra un nuevo usuario con rol PROFESSIONAL.
+        El usuario queda inactivo hasta que un administrador lo active.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              name: "Juan Pérez"
+              email: "juan@example.com"
+              password: "Pa55w.rd"
+              documentNumber: "1234567890"
+              phoneNumber: "+573001234567"
+      responses:
+        '201':
+          description: Profesional registrado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Profesional registrado exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email o documento ya registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/refresh:
+    post:
+      tags:
+        - Auth
+      summary: Renovar access token
+      description: |
+        Genera un nuevo access token usando el refresh token almacenado en cookies.
+        Útil cuando el access token ha expirado.
+      responses:
+        '200':
+          description: Access token renovado
+          headers:
+            Set-Cookie:
+              description: Nueva cookie con access token
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Access token generado exitosamente"
+        '401':
+          description: Refresh token inválido o expirado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/logout:
+    post:
+      tags:
+        - Auth
+      summary: Cerrar sesión
+      description: Invalida el refresh token y limpia las cookies de autenticación.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Sesión cerrada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Sesión cerrada exitosamente"
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /auth/me:
+    get:
+      tags:
+        - Auth
+      summary: Obtener usuario autenticado
+      description: Retorna la información del usuario actualmente autenticado.
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Usuario obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Usuario obtenido exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      user:
+                        $ref: '#/components/schemas/User'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

@@ -2,7 +2,7 @@
 
 class AppConfig {
 
-    public readonly FRONTEND_URL: string;
+    public readonly ALLOWED_ORIGINS: string[];
     public readonly PORT: string;
     public readonly NODE_ENV: string;
     public readonly SALT_ROUNDS_PASSWORD: number;
@@ -15,7 +15,10 @@ class AppConfig {
     public readonly JWT_REFRESH_EXP_DAYS: number;
 
     constructor() {
-        this.FRONTEND_URL = process.env.FRONTEND_URL || "http://localhost:5173";
+        this.ALLOWED_ORIGINS = process.env.ALLOWED_ORIGINS?.split(',') || [
+            "http://localhost:5173",
+            "https://dna-academy-client.vercel.app"
+        ];
         this.PORT = process.env.PORT || '3000';
         this.NODE_ENV = process.env.NODE_ENV || 'development';
         this.SALT_ROUNDS_PASSWORD = parseInt(process.env.SALT_ROUNDS_PASSWORD || '10');

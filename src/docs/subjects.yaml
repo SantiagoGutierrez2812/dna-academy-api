@@ -1,0 +1,433 @@
+paths:
+  /subjects:
+    get:
+      tags:
+        - Subjects
+      summary: Listar materias
+      description: |
+        Obtiene la lista de todas las materias.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Lista de materias obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Materias obtenidas exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      subjects:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Subject'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Subjects
+      summary: Crear materia
+      description: |
+        Crea una nueva materia y la asigna a un profesional.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateSubjectRequest'
+            example:
+              name: "Física"
+              professionalId: 3
+      responses:
+        '201':
+          description: Materia creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Materia creada"
+                  data:
+                    type: object
+                    properties:
+                      subject:
+                        $ref: '#/components/schemas/Subject'
+        '400':
+          description: Datos de entrada inválidos o profesional no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subjects/my-subjects:
+    get:
+      tags:
+        - Subjects
+      summary: Obtener mis materias
+      description: |
+        Obtiene las materias asignadas al profesional autenticado.
+        **Roles permitidos:** PROFESSIONAL
+      security:
+        - cookieAuth: []
+      responses:
+        '200':
+          description: Materias obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Mis materias obtenidas exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      subjects:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Subject'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subjects/{id}:
+    get:
+      tags:
+        - Subjects
+      summary: Obtener materia
+      description: |
+        Obtiene la información de una materia específica.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la materia
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Materia obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Materia obtenida exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      subject:
+                        $ref: '#/components/schemas/Subject'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Materia no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Subjects
+      summary: Actualizar materia
+      description: |
+        Actualiza la información de una materia.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la materia
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateSubjectRequest'
+            example:
+              name: "Física Avanzada"
+              professionalId: 4
+      responses:
+        '200':
+          description: Materia actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Materia actualizada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      subject:
+                        $ref: '#/components/schemas/Subject'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Materia no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Subjects
+      summary: Eliminar materia
+      description: |
+        Elimina una materia del sistema (soft delete).
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la materia
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Materia eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Materia eliminada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      subject:
+                        $ref: '#/components/schemas/Subject'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Materia no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subjects/{id}/students:
+    get:
+      tags:
+        - Subjects
+      summary: Obtener estudiantes de una materia
+      description: |
+        Obtiene la lista de estudiantes matriculados en una materia.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+
+        Para PROFESSIONAL, solo puede ver estudiantes de sus propias materias.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la materia
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Estudiantes obtenidos exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Estudiantes de la materia obtenidos exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      students:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Student'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos (PROFESSIONAL intentando ver otra materia)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Materia no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /subjects/{id}/students/{studentId}/grades:
+    get:
+      tags:
+        - Subjects
+      summary: Obtener notas de un estudiante en una materia
+      description: |
+        Obtiene las notas de un estudiante específico en una materia.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+
+        Para PROFESSIONAL, solo puede ver notas de sus propias materias.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la materia
+          schema:
+            type: integer
+            example: 1
+        - name: studentId
+          in: path
+          required: true
+          description: ID del estudiante
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Notas obtenidas exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Notas del estudiante obtenidas exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      studentSubjectId:
+                        type: integer
+                        nullable: true
+                        description: ID de la matrícula (null si no está matriculado)
+                        example: 1
+                      grades:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Grade'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Materia o estudiante no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

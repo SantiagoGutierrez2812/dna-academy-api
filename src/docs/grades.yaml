@@ -1,0 +1,193 @@
+paths:
+  /grades:
+    post:
+      tags:
+        - Grades
+      summary: Crear nota
+      description: |
+        Crea una nueva nota para un estudiante en una materia.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+
+        Para PROFESSIONAL, solo puede crear notas en sus propias materias.
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateGradeRequest'
+            example:
+              value: 4.5
+              description: "Examen parcial"
+              studentSubjectId: 1
+      responses:
+        '201':
+          description: Nota creada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Nota creada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      grade:
+                        $ref: '#/components/schemas/Grade'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "El valor de la nota debe estar entre 0 y 5"
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos (PROFESSIONAL intentando crear nota en otra materia)
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "No tienes acceso a esta materia"
+        '404':
+          description: Matrícula no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+              example:
+                message: "La inscripción ingresada no existe"
+
+  /grades/{id}:
+    patch:
+      tags:
+        - Grades
+      summary: Actualizar nota
+      description: |
+        Actualiza una nota existente.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+
+        Para PROFESSIONAL, solo puede actualizar notas de sus propias materias.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la nota
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateGradeRequest'
+            example:
+              value: 4.8
+              description: "Examen parcial - corregido"
+      responses:
+        '200':
+          description: Nota actualizada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Nota actualizada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      grade:
+                        $ref: '#/components/schemas/Grade'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Nota no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Grades
+      summary: Eliminar nota
+      description: |
+        Elimina una nota del sistema (soft delete).
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+
+        Para PROFESSIONAL, solo puede eliminar notas de sus propias materias.
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID de la nota
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Nota eliminada exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Nota eliminada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      grade:
+                        $ref: '#/components/schemas/Grade'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Nota no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

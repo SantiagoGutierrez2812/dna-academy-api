@@ -1,0 +1,418 @@
+paths:
+  /students:
+    get:
+      tags:
+        - Students
+      summary: Listar estudiantes
+      description: |
+        Obtiene la lista de todos los estudiantes.
+        Soporta búsqueda por nombre, email o documento.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: search
+          in: query
+          required: false
+          description: Término de búsqueda (nombre, email o documento)
+          schema:
+            type: string
+            example: "juan"
+      responses:
+        '200':
+          description: Lista de estudiantes obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Estudiantes obtenidos exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      students:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Student'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    post:
+      tags:
+        - Students
+      summary: Crear estudiante
+      description: |
+        Crea un nuevo estudiante en el sistema.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateStudentRequest'
+            example:
+              name: "Pedro López"
+              email: "pedro@student.com"
+              documentNumber: "5566778899"
+              countryId: 1
+      responses:
+        '201':
+          description: Estudiante creado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Estudiante creado exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      student:
+                        $ref: '#/components/schemas/Student'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: Email o documento ya registrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /students/{id}:
+    get:
+      tags:
+        - Students
+      summary: Obtener estudiante
+      description: |
+        Obtiene la información de un estudiante específico.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR, PROFESSIONAL
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del estudiante
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Estudiante obtenido exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Estudiante obtenido exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      student:
+                        $ref: '#/components/schemas/Student'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Estudiante no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    patch:
+      tags:
+        - Students
+      summary: Actualizar estudiante
+      description: |
+        Actualiza la información de un estudiante.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del estudiante
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateStudentRequest'
+            example:
+              name: "Pedro López Actualizado"
+              email: "pedro.nuevo@student.com"
+      responses:
+        '200':
+          description: Estudiante actualizado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Estudiante actualizado exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      student:
+                        $ref: '#/components/schemas/Student'
+        '400':
+          description: Datos de entrada inválidos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Estudiante no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+    delete:
+      tags:
+        - Students
+      summary: Eliminar estudiante
+      description: |
+        Elimina un estudiante del sistema (soft delete).
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del estudiante
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Estudiante eliminado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Estudiante eliminado exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      student:
+                        $ref: '#/components/schemas/Student'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Estudiante no encontrado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /students/{id}/subjects:
+    post:
+      tags:
+        - Students
+      summary: Matricular estudiante en materia
+      description: |
+        Matricula un estudiante en una materia específica.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del estudiante
+          schema:
+            type: integer
+            example: 1
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EnrollRequest'
+            example:
+              subjectId: 1
+      responses:
+        '201':
+          description: Estudiante matriculado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Inscripción realizada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      enrollment:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          studentId:
+                            type: integer
+                          subjectId:
+                            type: integer
+        '400':
+          description: Estudiante o materia no existe
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '409':
+          description: El estudiante ya está matriculado en esta materia
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /students/{id}/subjects/{subjectId}:
+    delete:
+      tags:
+        - Students
+      summary: Desmatricular estudiante de materia
+      description: |
+        Elimina la matrícula de un estudiante en una materia.
+        Las notas asociadas se eliminan en cascada.
+        **Roles permitidos:** ADMINISTRATOR, COORDINATOR
+      security:
+        - cookieAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: ID del estudiante
+          schema:
+            type: integer
+            example: 1
+        - name: subjectId
+          in: path
+          required: true
+          description: ID de la materia
+          schema:
+            type: integer
+            example: 1
+      responses:
+        '200':
+          description: Estudiante desmatriculado exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Desinscripción realizada exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      enrollment:
+                        type: object
+        '401':
+          description: No autenticado
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '403':
+          description: Sin permisos
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        '404':
+          description: Matrícula no encontrada
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'

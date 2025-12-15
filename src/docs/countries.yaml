@@ -1,0 +1,48 @@
+paths:
+  /countries:
+    get:
+      tags:
+        - Countries
+      summary: Listar países
+      description: |
+        Obtiene la lista de todos los países disponibles.
+        Los datos provienen de una API externa (RestCountries) y se almacenan en caché en la base de datos.
+
+        **Nota:** Este endpoint no requiere autenticación.
+      responses:
+        '200':
+          description: Lista de países obtenida exitosamente
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Países obtenidos exitosamente"
+                  data:
+                    type: object
+                    properties:
+                      countries:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Country'
+              example:
+                message: "Países obtenidos exitosamente"
+                data:
+                  countries:
+                    - id: 1
+                      name: "Colombia"
+                      code: "CO"
+                    - id: 2
+                      name: "Argentina"
+                      code: "AR"
+                    - id: 3
+                      name: "México"
+                      code: "MX"
+        '500':
+          description: Error al obtener países
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
