@@ -118,7 +118,7 @@ DATABASE_URL="postgresql://usuario:password@host:5432/dna_academy"
 # Servidor
 PORT=3000
 NODE_ENV=development
-FRONTEND_URL=http://localhost:5173
+ALLOWED_ORIGINS=http://localhost:5173
 
 # Seguridad
 SALT_ROUNDS_PASSWORD=10
@@ -142,7 +142,7 @@ JWT_REFRESH_EXP_DAYS=7
 | `DATABASE_URL` | URL de conexión a PostgreSQL | - |
 | `PORT` | Puerto del servidor | 3000 |
 | `NODE_ENV` | Entorno de ejecución | development |
-| `FRONTEND_URL` | URL del frontend (CORS) | http://localhost:5173 |
+| `ALLOWED_ORIGINS` | URLs permitidas para CORS (separadas por coma) | http://localhost:5173 |
 | `SALT_ROUNDS_PASSWORD` | Rondas de hash bcrypt | 10 |
 | `LOGIN_LOCKOUT_MINUTES` | Minutos de bloqueo por intentos fallidos | 15 |
 | `OTP_EXPIRATION_MINUTES` | Minutos de validez del OTP | 15 |
