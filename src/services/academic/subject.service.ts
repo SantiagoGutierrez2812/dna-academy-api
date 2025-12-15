@@ -17,6 +17,10 @@ class SubjectService {
             throw new HttpError(404, "No existe el profesional ingresado");
         }
 
+        if (professional.role !== "PROFESSIONAL") {
+            throw new HttpError(400, `No se puede asignar una materia a un usuario con rol ${professional.role}`);
+        }
+
         try {
             return await subjectRepository.create({ name, professionalId });
         } catch (error: unknown) {
@@ -29,7 +33,19 @@ class SubjectService {
         const data: Prisma.SubjectUncheckedUpdateInput = {};
 
         if (params.name !== undefined) data.name = params.name;
-        if (params.professionalId !== undefined) data.professionalId = params.professionalId;
+        if (params.professionalId !== undefined) {
+            const professional: User | null = await userRepository.find({ id: params.professionalId });
+
+            if (!professional) {
+                throw new HttpError(404, "No existe el profesional ingresado");
+            }
+
+            if (professional.role !== "PROFESSIONAL") {
+                throw new HttpError(400, `No se puede asignar una materia a un usuario con rol ${professional.role}`);
+            }
+
+            data.professionalId = params.professionalId;
+        }
 
         try {
             return await subjectRepository.update(id, data);
@@ -51,6 +67,17 @@ class SubjectService {
     }
 
     async getMySubjects(professionalId: number): Promise<Subject[]> {
+
+        const professional: User | null = await userRepository.find({ id: professionalId });
+
+        if (!professional) {
+            throw new HttpError(404, "No existe el profesional ingresado");
+        }
+
+        if (professional.role !== "PROFESSIONAL") {
+            throw new HttpError(400, `Un usuario con rol ${professional.role} no tiene materias asignadas`);
+        }
+
         return await subjectRepository.getSubjectsByProfessionalId(professionalId);
     }
 
@@ -65,7 +92,7 @@ class SubjectService {
         return subject
     }
 
-    async getStudents(subjectId: number): Promise<Student[]> {
+    async getStudents(subjectId: number, userId: number, role: string): Promise<Student[]> {
 
         const subject: Subject | null = await subjectRepository.find({ id: subjectId });
 
@@ -73,15 +100,23 @@ class SubjectService {
             throw new HttpError(404, "Materia no encontrada");
         }
 
+        if (role === "PROFESSIONAL" && subject.professionalId !== userId) {
+            throw new HttpError(403, "No tienes acceso a esta materia");
+        }
+
         return await subjectRepository.getStudentsBySubjectId(subjectId);
     }
 
-    async getStudentGrades(subjectId: number, studentId: number): Promise<Grade[]> {
+    async getStudentGrades(subjectId: number, studentId: number, userId: number, role: string): Promise<Grade[]> {
 
         const subject: Subject | null = await subjectRepository.find({ id: subjectId });
 
         if (!subject) {
             throw new HttpError(404, "Materia no encontrada");
+        }
+
+        if (role === "PROFESSIONAL" && subject.professionalId !== userId) {
+            throw new HttpError(403, "No tienes acceso a esta materia");
         }
 
         return await subjectRepository.getStudentGrades(subjectId, studentId);

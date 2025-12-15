@@ -75,8 +75,10 @@ class SubjectController {
     async getStudents(req: Request, res: Response): Promise<void> {
 
         const subjectId: number = Number(req.params.id);
+        const userId: number = req.userId!;
+        const role: string = req.userRole!;
 
-        const students: Student[] = await subjectService.getStudents(subjectId);
+        const students: Student[] = await subjectService.getStudents(subjectId, userId, role);
 
         res.status(200).json({
             message: "Estudiantes de la materia obtenidos exitosamente",
@@ -88,8 +90,10 @@ class SubjectController {
 
         const subjectId: number = Number(req.params.id);
         const studentId: number = Number(req.params.studentId);
+        const userId: number = req.userId!;
+        const role: string = req.userRole!;
 
-        const grades: Grade[] = await subjectService.getStudentGrades(subjectId, studentId);
+        const grades: Grade[] = await subjectService.getStudentGrades(subjectId, studentId, userId, role);
 
         res.status(200).json({
             message: "Notas del estudiante obtenidas exitosamente",
